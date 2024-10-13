@@ -5,17 +5,17 @@ import Car from "./Car.js";
 import Motorbike from "./Motorbike.js";
 import Wheel from "./Wheel.js";
 
-// define the Cli class
+// define the Cli classclit
 class Cli {
   // TODO: update the vehicles property to accept Truck and Motorbike objects as well
   // TODO: You will need to use the Union operator to define additional types for the array
   // TODO: See the AbleToTow interface for an example of how to use the Union operator
-  vehicles: (Car | MotorBike | Truck)[];
+  vehicles: (Car | Motorbike | Truck)[];
   selectedVehicleVin: string | undefined;
   exit: boolean = false;
 
   // TODO: Update the constructor to accept Truck and Motorbike objects as well
-  constructor(vehicles: (Car | MotorBike | Truck)[]) {
+  constructor(vehicles: (Car | Motorbike | Truck)[]) {
     this.vehicles = vehicles;
   }
 
@@ -68,11 +68,9 @@ class Cli {
         if (answers.vehicleType === 'Car') {
           // create a car
           this.createCar();
-        };
-        else if (answers.vehichleType === 'Motorbike') {
+        } else if (answers.vehicleType === 'Motorbike') {
           this.createMotorbike();
-        };
-        else (answers.vehichleType === 'Truck') {
+        } else if (answers.vehicleType === 'Truck') {
           this.createTruck();
         }
 
@@ -178,10 +176,6 @@ class Cli {
       ])
       .then((answers) => {
         const truck = new Truck(
-        // TODO: Use the answers object to pass the required properties to the Truck constructor
-        // TODO: push the truck to the vehicles array
-        // TODO: set the selectedVehicleVin to the vin of the truck
-        // TODO: perform actions on the truck
         Cli.generateVin(),
         answers.color,
         answers.make,
@@ -189,10 +183,13 @@ class Cli {
         parseInt(answers.year),
         parseInt(answers.weight),
         parseInt(answers.topSpeed),
-        parseInt(answers.towingCapacity)
-        []
+        parseInt(answers.towingCapacity), // This line is correct
+        [] // This line should be added to fix the error
       );
-
+// TODO: Use the answers object to pass the required properties to the Truck constructor
+        // TODO: push the truck to the vehicles array
+        // TODO: set the selectedVehicleVin to the vin of the truck
+        // TODO: perform actions on the truck
       this.vehicles.push(truck);
         // set the selectedVehicleVin to the vin of the car
         this.selectedVehicleVin = truck.vin;
@@ -235,44 +232,21 @@ class Cli {
           name: 'topSpeed',
           message: 'Enter Top Speed',
         },
-        {
-          type: 'input',
-          name: 'frontWheelDiameter',
-          message: 'Enter Front Wheel Diameter',
-        },
-        {
-          type: 'input',
-          name: 'frontWheelBrand',
-          message: 'Enter Front Wheel Brand',
-        },
-        {
-          type: 'input',
-          name: 'rearWheelDiameter',
-          message: 'Enter Rear Wheel Diameter',
-        },
-        {
-          type: 'input',
-          name: 'rearWheelBrand',
-          message: 'Enter Rear Wheel Brand',
-        },
       ])
       .then((answers) => {
         const motorbike = new Motorbike(
+          Cli.generateVin(),
           answers.color,
           answers.make,
           answers.model,
           parseInt(answers.year),
           parseInt(answers.weight),
           parseInt(answers.topSpeed),
-          parseInt(answers.frontWheelDiameter),
-          pareseInt(answers.frontWheelBrand),
-          parseInt(answers.rearWheelDiameter),
-          parseInt(answers.rearWheelBrand),
           []
         );
-        this.vehichle.push(motorbike);
+        this.vehicles.push(motorbike);
 
-        this.selectedVehichleVin = motorbike.vin;
+        this.selectedVehicleVin = motorbike.vin;
 
         this.performActions()
         // TODO: Use the answers object to pass the required properties to the Motorbike constructor
@@ -300,6 +274,16 @@ class Cli {
         },
       ])
       .then((answers) => {
+        const selectedVehicle = this.vehicles.find(v => v.vin === answers.vehicleToTow.vin);
+
+        if (selectedVehicle?.vin === vehicle.vin) {
+          console.log('The truck cannot tow itself');
+        } else{
+          console.log(`${vehicle.make} ${vehicle.model} is towing ${selectedVehicle?.make} ${selectedVehicle?.model}`);
+        }
+          this.performActions();
+          return;
+        
         // TODO: check if the selected vehicle is the truck
         // TODO: if it is, log that the truck cannot tow itself then perform actions on the truck to allow the user to select another action
         // TODO: if it is not, tow the selected vehicle then perform actions on the truck to allow the user to select another action
@@ -391,6 +375,21 @@ class Cli {
           }
         }
         // TODO: add statements to perform the tow action only if the selected vehicle is a truck. Call the findVehicleToTow method to find a vehicle to tow and pass the selected truck as an argument. After calling the findVehicleToTow method, you will need to return to avoid instantly calling the performActions method again since findVehicleToTow is asynchronous.
+        else if (answers.action === 'Tow a car') {
+          for (let i = 0; i < this.vehicles.length; i++) {
+            if (this.vehicles[i].vin === this.selectedVehicleVin && this.vehicles[i] instanceof Truck) {
+              this.findVehicleToTow(this.vehicles[i] as Truck);
+              return;
+            }
+          }
+        }
+        else if (answers.action === 'Pop a wheelie') {
+          for (let i = 0; i < this.vehicles.length; i++) {
+            if (this.vehicles[i].vin === this.selectedVehicleVin && this.vehicles[i] instanceof Motorbike) {
+              (this.vehicles[i] as Motorbike).wheelie();
+            }
+          }
+        }
         // TODO: add statements to perform the wheelie action only if the selected vehicle is a motorbike
         else if (answers.action === 'Select or create another vehicle') {
           // start the cli to return to the initial prompt if the user wants to select or create another vehicle

@@ -21,7 +21,7 @@ class Motorbike extends Vehicle {
     year: number,
     weight: number,
     topSpeed: number,
-    wheels: Wheel[],
+    wheels: Wheel[] = [],
   ) {
     super();
 
